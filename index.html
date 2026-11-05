@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Medha Singh</title>
+<meta name="description" content="Medha Singh, software engineer. Head in the clouds. Hands in the code.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;500;700&family=Schibsted+Grotesk:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main id="stage" aria-label="Medha Singh, portfolio concept">
+  <img id="photo" src="assets/background.jpg" alt="">
+  <div id="veil"></div>
+  <canvas id="ascii" aria-hidden="true"></canvas>
+  <h1 id="say"><span class="s1">Head in <br>the clouds.<small>Where the ideas start.</small></span> <span class="s2"><span id="typed">Hands in <br>the code.</span><i id="caret" aria-hidden="true"></i><small>Where shipping makes them real.</small></span></h1>
+  <div id="head" aria-hidden="true"><div id="headFloat"><div id="headTilt">
+    <img id="headShadow" src="assets/head_top.png" alt="">
+    <img id="sclera" src="assets/sclera.png" alt="">
+    <div class="iris" id="irisL"><b></b></div><div class="iris" id="irisR"><b></b></div>
+    <div class="lid" id="lidL"><i></i></div><div class="lid" id="lidR"><i></i></div>
+    <img id="headTop" src="assets/head_top.png" alt="">
+  </div></div></div>
+  <nav id="orbit" aria-label="Sections"></nav>
+  <div id="haze" aria-hidden="true"></div>
+  <footer id="foot" class="furn">
+    <p class="me"><strong>Medha Singh</strong><span>Software Engineer</span></p>
+    <nav class="links" aria-label="Elsewhere">
+      <a href="https://www.linkedin.com/in/medhaaa/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="mailto:hello.medhasingh@gmail.com" id="btnMail">Email</a>
+      <a href="https://open.spotify.com/playlist/5HdGa3KVBzxfosFSMJsMr5" target="_blank" rel="noopener">Spotify</a>
+      <a href="https://drive.google.com/file/d/1-HUf6zIbB5uley7Cm9Hi7UhboLrMWPuA/view?usp=sharing" target="_blank" rel="noopener">Resume</a>
+    </nav>
+    <button id="btnPlain" class="plainbtn" type="button">Plain version →</button>
+    <p class="tip" id="tip">drag the sky to spin</p>
+  </footer>
+  <button id="skip">skip intro</button>
+</main>
+<div id="toast" role="status"></div>
+
+<script src="content.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
