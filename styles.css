@@ -180,12 +180,15 @@ body.ready #skip{display:none}
 .fsblock{
   --app-bg:#fff; --app-line:#e3e5ea; --app-soft:#f5f6f9; --app-accent:#2f3e9e; --app-sel:#e4e8fb;
   --app-ink:#14171a; --app-mute:#555b69; --bad:#c8402f; --good:#1f5f52;
+  /* the stage bleeds out to the text column's gutter so tilted corners and
+     window shadows are not sheared off by the clip that keeps the page from scrolling */
+  --fsbleed:max(18px,4vw);
 }
 .fsctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:16px}
 .fsnotes{display:inline-flex;align-items:center;gap:7px;font:500 13px var(--mono);color:var(--mute)}
 .fsnotes input{accent-color:var(--maroon);width:15px;height:15px}
 
-.fsdemo{display:grid;grid-template-columns:minmax(0,1fr);margin-top:20px;overflow-x:clip}
+.fsdemo{display:grid;grid-template-columns:minmax(0,1fr);margin-top:20px;padding-inline:var(--fsbleed);margin-inline:calc(0px - var(--fsbleed));overflow-x:clip}
 .fsbefore,.fsafter{grid-area:1/1;min-width:0}
 .fsbefore{position:relative;height:500px;transition:visibility 0s .6s}
 .fswin{background:var(--app-bg);border:1px solid var(--navy);border-radius:3px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 14px 28px rgba(15,42,74,.26);font:12px/1.45 var(--body);color:var(--app-ink)}
