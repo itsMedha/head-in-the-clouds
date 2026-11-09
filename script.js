@@ -250,20 +250,181 @@ function head(eyebrow,title,when){return '<header class="rhead"><div class="rwra
 
 var ROOMS={
 filespace:function(root){var d=DATA.project1;
+  /* Before and after, from one data source. ROWS feeds all three tables, which is the point:
+     same rows, three views. The data is invented; the real product is confidential. */
+  var ROWS=[
+   {name:"Q3_vendor_contracts.pdf",owner:"A. Rao",size:"1.4 MB",bytes:1468006,path:"DemoFiles/Legal",date:"23 Sep 2025",iso:"2025-09-23",tags:["Contract","Retain-6Y"],body:"Vendor agreements for Q3.\nRenewal terms on page 4, signatures pending for two suppliers."},
+   {name:"onboarding_checklist.docx",owner:"L. Chen",size:"316 KB",bytes:323584,path:"DemoFiles/HR",date:"23 Sep 2025",iso:"2025-09-23",tags:["HR"],body:"Day 1: accounts and badge.\nWeek 1: team intro, tooling setup, first review."},
+   {name:"shift_roster_JIS.txt",owner:"K. Tanaka",size:"1.2 KB",bytes:1198,path:"DemoFiles/Ops",date:"22 Sep 2025",iso:"2025-09-22",tags:["Ops"],body:"Mon to Fri: early shift 06:00, late shift 14:00.\nWeekend cover rotates weekly."},
+   {name:"invoice_batch_0421.csv",owner:"M. Ortiz",size:"71 KB",bytes:72704,path:"DemoFiles/Finance",date:"19 Sep 2025",iso:"2025-09-19",tags:["Finance","Retain-10Y"],body:"invoice_id,amount,status\n0421-001,1200.00,paid\n0421-002,860.50,open"},
+   {name:"meeting_notes_sept.txt",owner:"S. Iyer",size:"137 B",bytes:137,path:"DemoFiles/Notes",date:"18 Sep 2025",iso:"2025-09-18",tags:["Notes"],body:"Agreed: one screen for search and export.\nNext: review the toolbar."},
+   {name:"retention_policy_v2.pdf",owner:"D. Mensah",size:"5.8 MB",bytes:6081740,path:"DemoFiles/Legal",date:"12 Sep 2025",iso:"2025-09-12",tags:["Policy","Retain-6Y"],body:"Records are kept for six years unless a hold applies.\nDisposal needs sign-off."},
+   {name:"site_audit_photos.zip",owner:"P. Novak",size:"9.2 MB",bytes:9646899,path:"DemoFiles/Ops",date:"08 Sep 2025",iso:"2025-09-08",tags:["Audit"],body:"Archive: 42 images from the September site audit."},
+   {name:"release_summary.html",owner:"R. Haddad",size:"4.2 KB",bytes:4301,path:"DemoFiles/Notes",date:"02 Sep 2025",iso:"2025-09-02",tags:["Notes","Dispose"],body:"Release summary\nSearch, preview and export now live on one screen."}
+  ];
+  var TOTAL="1,248";
+  var COPY={
+   before:{h:"Same results. Two places to work.",
+    s:"Workspace Main and Raw Data showed the same search results, but each tab had its own layout, preview and actions. Click either window, try the rows.",
+    cta:"Merge into one workspace →",
+    legend:[
+     ["bad","An always-open content panel takes space from the results table."],
+     ["bad","Preserve All and Export sit at the bottom, apart from the top toolbar."],
+     ["bad","The total count is only in the pager at the bottom."],
+     ["bad","The same results again in a second tab, so you had to know which tab a task belonged in."],
+     ["good","Double-click opens a row's content. The redesign kept this."],
+     ["bad","No Preserve or Export in this view, so finishing a task meant switching tabs."]],
+    journey:[["Raw Data: search"],["Double-click to read"],["Switch tab","bad"],["Workspace Main"],["Preserve / Export at the bottom"]]},
+   after:{h:"One unified workspace.",
+    s:"Search, sort, read and act on one screen. Double-click a row to read it.",
+    cta:"← Back to the two tabs",
+    legend:[
+     ["good","Total items shown up front, so result size is clear at once."],
+     ["good","Preserve All, Cross-tabulation and Export grouped in one top-right toolbar."],
+     ["good","No always-open panel, so results use the full width."],
+     ["good","Double-click opens a row's content on demand; close it to return to results."]],
+    journey:[["Search"],["Filter / sort"],["Results"],["Double-click"],["View content"],["Preserve / cross-tabulate / export"]]}
+  };
+  var SIDE='<span class="fsnav dim">Search History</span><span class="fsnav dim">Audit Log</span><span class="fsnav dim">Export</span>';
   root.innerHTML=head(d.eyebrow,d.title,d.timeframe)+
-  '<div class="block"><div class="rwrap"><h2>Every step lived somewhere else.</h2><p class="lead">Search, filters, raw data, preview and export each sat on their own. Merge them to see what the work did, then use the export fields to choose what you read.</p><div class="btns" style="margin-top:14px"><button class="btn pri" id="fsMerge" type="button">Merge into one</button></div><div class="fsd" id="fsd"><div class="frame"></div></div><p class="note" style="margin-top:8px">Mock rows and a simplified layout. The real product is confidential.</p></div></div>'+
+  '<div class="block fsblock"><div class="rwrap">'+
+    '<h2 id="fsH"></h2><p class="lead" id="fsSub"></p>'+
+    '<div class="fsctl"><button class="btn pri" id="fsSwap" type="button"></button>'+
+    '<label class="fsnotes"><input type="checkbox" id="fsNotes" checked> Show notes</label></div>'+
+    '<section class="fsdemo" id="fsStage" data-state="before" data-notes="on" aria-label="Interactive demo">'+
+      '<div class="fsbefore" id="fsBefore">'+
+        '<article class="fswin fswin-a is-front" id="fsWinA" aria-label="Before: Workspace Main tab">'+
+          '<div class="fschrome"><i></i><i></i><i></i><span>Workspace Main</span></div>'+
+          '<div class="fsapp"><nav class="fsside">'+
+            '<button class="fsnav is-on" data-go="fsWinA" type="button">Workspace Main</button>'+
+            '<button class="fsnav" data-go="fsWinB" type="button">Raw Data</button>'+SIDE+'</nav>'+
+          '<div class="fsmain">'+
+            '<div class="fsbar"><strong>Workspace Main</strong><span class="fssp"></span>'+
+              '<span class="fsico" title="Filter"></span><span class="fsico" title="Saved searches"></span><span class="fsico" title="Tags"></span><span class="fsico r" title="Refresh"></span></div>'+
+            '<div class="fssplit"><div class="fstbl"><table><thead><tr><th>File Name</th><th style="width:30%">Size</th></tr></thead><tbody id="fsTbA"></tbody></table></div>'+
+              '<aside class="fsprev" id="fsPvA" aria-live="polite"></aside></div>'+
+            '<div class="fsfoot"><b class="fspin">3</b><span>1–8 of '+TOTAL+'</span><span class="fssp"></span>'+
+              '<b class="fspin">2</b><span class="fsbtn solid">Preserve All</span><span class="fsbtn solid">Export</span></div>'+
+          '</div></div></article>'+
+        '<article class="fswin fswin-b" id="fsWinB" aria-label="Before: Raw Data tab">'+
+          '<div class="fschrome"><i></i><i></i><i></i><span>Raw Data</span></div>'+
+          '<div class="fsapp"><nav class="fsside">'+
+            '<button class="fsnav" data-go="fsWinA" type="button">Workspace Main</button>'+
+            '<button class="fsnav is-on" data-go="fsWinB" type="button">Raw Data</button>'+SIDE+'</nav>'+
+          '<div class="fsmain">'+
+            '<div class="fsbar"><strong>Raw Data</strong><span class="fssp"></span><b class="fspin">4</b>'+
+              '<span class="fsico r" title="Refresh"></span><span class="fsico" title="Columns"></span></div>'+
+            '<div class="fstbl"><table><thead><tr><th>File Name</th><th style="width:16%">Size</th><th style="width:22%">Path</th><th style="width:22%">Date Created</th></tr></thead><tbody id="fsTbB"></tbody></table></div>'+
+            '<div class="fsfoot"><b class="fspin good">5</b><span class="fshint">Double-click a row to view its content</span><span class="fssp"></span>'+
+              '<span class="fsghost">no Preserve / Export here</span><b class="fspin">6</b></div>'+
+            '<div class="fspop" id="fsPopB"><div class="fscard" role="dialog" aria-label="File content"></div></div>'+
+          '</div></div></article>'+
+      '</div>'+
+      '<div class="fsafter" id="fsAfter">'+
+        '<article class="fswin" id="fsWinU" aria-label="After: unified File Space">'+
+          '<div class="fschrome"><i></i><i></i><i></i><span>File Space</span></div>'+
+          '<div class="fsapp"><nav class="fsside"><span class="fsnav dim">Dashboard</span><span class="fsnav is-on">File Space</span>'+
+            '<span class="fsnav dim">Search History</span><span class="fsnav dim">Audit Log</span><span class="fsnav dim">Exports</span></nav>'+
+          '<div class="fsmain">'+
+            '<div class="fsbar"><strong>File Space</strong><span class="fscount" id="fsCount"></span><b class="fspin good">1</b>'+
+              '<span class="fssp"></span><b class="fspin good">2</b>'+
+              '<div class="fstools"><span class="fsbtn">Preserve All</span><span class="fsbtn">Cross-tabulation</span><span class="fsbtn solid">Export</span></div></div>'+
+            '<div class="fsbar"><input class="fssearch" id="fsQ" placeholder="Search for a keyword…" aria-label="Search results"><b class="fspin good">3</b></div>'+
+            '<div class="fstbl"><table><thead><tr><th><span class="fspin good">4</span></th><th data-k="name">File Name</th><th data-k="owner" style="width:13%">Owner</th><th data-k="bytes" style="width:10%">Size</th><th data-k="path" style="width:16%">Path</th><th data-k="iso" style="width:14%">Date Created</th><th style="width:17%">Tags</th></tr></thead><tbody id="fsTbU"></tbody></table></div>'+
+            '<div class="fsfoot"><span class="fshint">Double-click a row to view its content. Click a column to sort.</span></div>'+
+            '<div class="fspop" id="fsPopU"><div class="fscard" role="dialog" aria-label="File content"></div></div>'+
+          '</div></div></article>'+
+      '</div>'+
+    '</section>'+
+    '<ol class="fslegend" id="fsLegend"></ol>'+
+    '<div class="fsjourney" id="fsJourney" aria-label="Path to finish a task"></div>'+
+    '<p class="note" style="margin-top:18px">Mock rows and a simplified layout. The real product is confidential.</p>'+
+  '</div></div>'+
   '<div class="block"><div class="rwrap"><h2>The consolidation, mapped</h2><img class="flowimg" src="'+esc(d.flowImage.src)+'" alt="'+esc(d.flowImage.alt)+'" loading="lazy"></div></div>'+caseStudy(d)+pager("filespace");
-  var fsd=$("#fsd",root),P=[["Search",'<span class="mock">quarterly audit▌</span>'],["Filters",'<span class="mock">☑ mail</span><span class="mock">☐ files</span><span class="mock">☑ last 90 days</span>'],["Raw data",'<span class="mock">example_01.parquet</span><span class="mock">example_02.json</span><span class="mock">example_03.pst</span><span class="mock">example_04.pdf</span>'],["Preview",'<div class="stm" id="fsStory"><span class="mock">Pick a row to preview.</span></div>'],["Export",'<span class="mock">columns are fixed</span>']];
-  var SC=[[3,7,27,27,-2],[5,58,25,32,1.5],[68,6,29,38,2],[63,50,34,42,-1.5],[34,33,27,26,1]];
-  var minis=P.map(function(p,i){var m=document.createElement("div");m.className="mini";m.innerHTML='<div class="mb">'+p[0]+'</div><div class="mc">'+p[1]+"</div>";var s=SC[i];m.style.cssText="left:"+s[0]+"%;top:"+s[1]+"%;width:"+s[2]+"%;height:"+s[3]+"%;transform:rotate("+s[4]+"deg)";fsd.appendChild(m);return m});
-  var merged=false,mb=$("#fsMerge",root),ST={Problem:d.problem,Solution:d.solution,Contribution:d.contribution,Outcome:d.outcome},on={Problem:1,Outcome:1};
-  function layout(){var L=innerWidth<760?[[0,0,100,11],[0,11,40,23],[40,11,60,23],[0,34,100,46],[0,80,100,20]]:[[0,0,100,11],[0,11,16,70],[16,11,27,70],[43,11,57,70],[0,81,100,19]];minis.forEach(function(m,i){var l=L[i];m.style.left=l[0]+"%";m.style.top=l[1]+"%";m.style.width=l[2]+"%";m.style.height=l[3]+"%";m.style.transform="none"})}
-  function drawStory(){var keys=Object.keys(ST).filter(function(k){return on[k]});$("#fsStory",root).innerHTML=keys.length?keys.map(function(k){return "<b>"+k+"</b>"+rich(ST[k]).replace(/class="bul"/,"")}).join(""):'<span class="mock">No fields selected.</span>'}
-  mb.onclick=function(){merged=!merged;fsd.classList.toggle("merged",merged);
-    if(merged){layout();mb.textContent="Split it again";$(".mc",minis[4]).innerHTML='<div class="pick">'+Object.keys(ST).map(function(k){return '<label><input type="checkbox" data-k="'+k+'"'+(on[k]?" checked":"")+">"+k+"</label>"}).join("")+"</div>";$(".mc",minis[4]).onchange=function(e){on[e.target.dataset.k]=e.target.checked;drawStory()};drawStory();
-      if(!$(".fsok",root)){var o=document.createElement("span");o.className="fsok";o.textContent="~60% fewer clicks, search to export";mb.parentNode.appendChild(o)}}
-    else{mb.textContent="Merge into one";minis.forEach(function(m,i){var s=SC[i];m.style.left=s[0]+"%";m.style.top=s[1]+"%";m.style.width=s[2]+"%";m.style.height=s[3]+"%";m.style.transform="rotate("+s[4]+"deg)"});$(".mc",minis[4]).innerHTML=P[4][1];$("#fsStory",root).innerHTML='<span class="mock">Pick a row to preview.</span>';var o=$(".fsok",root);if(o)o.remove()}};
-  var rl=function(){if(merged)layout()};addEventListener("resize",rl);roomClean.push(function(){removeEventListener("resize",rl)});
+
+  var fsStage=$("#fsStage",root),fsState="before";
+  function fsTags(r){return r.tags.map(function(t){return '<span class="fstag">'+esc(t)+"</span>"}).join("")}
+  function fsCard(r){return "<header><h3>"+esc(r.name)+'</h3><button class="fsx" type="button" aria-label="Close">×</button></header>'+
+    '<dl class="fsmeta"><dt>Owner</dt><dd>'+esc(r.owner)+"</dd><dt>Created</dt><dd>"+esc(r.date)+"</dd><dt>Path</dt><dd>"+esc(r.path)+"</dd></dl>"+
+    '<div class="fsdoc">'+esc(r.body)+"</div>"}
+  /* open on double-click, double-tap or Enter; single click selects */
+  function fsWire(tbody,onSelect,onOpen){
+    var last={i:null,t:0};
+    tbody.addEventListener("click",function(e){
+      var tr=e.target.closest("tr[data-i]");if(!tr||e.target.closest("input"))return;
+      var now=Date.now(),i=+tr.dataset.i;
+      if(onSelect)onSelect(i,tr);
+      if(onOpen&&last.i===i&&now-last.t<450){onOpen(i);last.t=0}else last={i:i,t:now};
+    });
+    tbody.addEventListener("keydown",function(e){
+      var tr=e.target.closest("tr[data-i]");if(!tr||e.key!=="Enter")return;
+      e.preventDefault();(onOpen||onSelect)(+tr.dataset.i,tr);
+    });
+  }
+  function fsMark(tbody,tr){var s=tbody.querySelector(".is-sel");if(s)s.classList.remove("is-sel");tr.classList.add("is-sel")}
+  function fsOpen(pop,i){pop.firstElementChild.innerHTML=fsCard(ROWS[i]);pop.classList.add("is-open");pop.querySelector(".fsx").focus()}
+  function fsCloseAll(){root.querySelectorAll(".fspop.is-open").forEach(function(p){p.classList.remove("is-open")})}
+  root.querySelectorAll(".fspop").forEach(function(p){
+    p.addEventListener("click",function(e){if(e.target===p||e.target.closest(".fsx"))p.classList.remove("is-open")});
+  });
+  /* Escape closes the content card first; the room's own Escape only fires once nothing is open. */
+  function fsEsc(e){if(e.key!=="Escape")return;var o=root.querySelector(".fspop.is-open");if(!o)return;
+    o.classList.remove("is-open");e.stopPropagation();e.preventDefault()}
+  document.addEventListener("keydown",fsEsc,true);
+  roomClean.push(function(){document.removeEventListener("keydown",fsEsc,true)});
+
+  function fsPaint(){
+    var c=COPY[fsState];
+    fsStage.dataset.state=fsState;
+    $("#fsH",root).textContent=c.h;$("#fsSub",root).textContent=c.s;$("#fsSwap",root).textContent=c.cta;
+    $("#fsBefore",root).inert=fsState!=="before";$("#fsAfter",root).inert=fsState!=="after";
+    $("#fsLegend",root).innerHTML=c.legend.map(function(l,i){return '<li><b class="fspin'+(l[0]==="good"?" good":"")+'">'+(i+1)+"</b><span>"+esc(l[1])+"</span></li>"}).join("");
+    $("#fsJourney",root).innerHTML=c.journey.map(function(j,i){return (i?"<i></i>":"")+'<span class="'+(j[1]||"")+'">'+esc(j[0])+"</span>"}).join("");
+    fsCloseAll();
+  }
+  $("#fsSwap",root).addEventListener("click",function(){fsState=fsState==="before"?"after":"before";fsPaint()});
+  $("#fsNotes",root).addEventListener("change",function(e){
+    fsStage.dataset.notes=e.target.checked?"on":"off";$("#fsLegend",root).hidden=!e.target.checked;
+  });
+
+  /* BEFORE: Workspace Main */
+  var fsTbA=$("#fsTbA",root);
+  fsTbA.innerHTML=ROWS.map(function(r,i){return '<tr data-i="'+i+'" tabindex="0"><td>'+esc(r.name)+"</td><td>"+esc(r.size)+"</td></tr>"}).join("");
+  function fsShowA(i,tr){var r=ROWS[i];fsMark(fsTbA,tr||fsTbA.rows[i]);
+    $("#fsPvA",root).innerHTML='<b class="fspin" style="float:right">1</b><dl><dt>Date:</dt><dd>'+esc(r.date)+"</dd><dt>File Name:</dt><dd>"+esc(r.name)+'</dd></dl><div class="fsdoc">'+esc(r.body)+"</div>"}
+  fsWire(fsTbA,fsShowA,null);fsShowA(0);
+
+  /* BEFORE: Raw Data */
+  var fsTbB=$("#fsTbB",root);
+  fsTbB.innerHTML=ROWS.map(function(r,i){return '<tr data-i="'+i+'" tabindex="0"><td>'+esc(r.name)+"</td><td>"+esc(r.size)+"</td><td>"+esc(r.path)+"</td><td>"+esc(r.date)+"</td></tr>"}).join("");
+  fsWire(fsTbB,function(i,tr){fsMark(fsTbB,tr)},function(i){fsOpen($("#fsPopB",root),i)});
+
+  /* bring a window to the front */
+  function fsFront(id){["fsWinA","fsWinB"].forEach(function(w){$("#"+w,root).classList.toggle("is-front",w===id)})}
+  ["fsWinA","fsWinB"].forEach(function(w){$("#"+w,root).addEventListener("pointerdown",function(){fsFront(w)})});
+  root.querySelectorAll("[data-go]").forEach(function(b){b.addEventListener("click",function(){fsFront(b.dataset.go)})});
+
+  /* AFTER: unified File Space */
+  var fsTbU=$("#fsTbU",root),fsPicked={},fsSort={k:null,d:1},fsQuery="";
+  function fsDrawU(){
+    var rows=ROWS.map(function(r,i){return {r:r,i:i}}).filter(function(x){return x.r.name.toLowerCase().indexOf(fsQuery)>-1});
+    if(fsSort.k)rows.sort(function(a,b){var x=a.r[fsSort.k],y=b.r[fsSort.k];return (x>y?1:x<y?-1:0)*fsSort.d});
+    fsTbU.innerHTML=rows.length?rows.map(function(x){var r=x.r;
+      return '<tr data-i="'+x.i+'" tabindex="0"'+(fsPicked[x.i]?' class="is-sel"':"")+'><td><input type="checkbox" aria-label="Select '+esc(r.name)+'"'+(fsPicked[x.i]?" checked":"")+"></td><td>"+esc(r.name)+"</td><td>"+esc(r.owner)+"</td><td>"+esc(r.size)+"</td><td>"+esc(r.path)+"</td><td>"+esc(r.date)+"</td><td>"+fsTags(r)+"</td></tr>"}).join("")
+     :'<tr><td colspan="7" class="fshint">No files match that search.</td></tr>';
+    var n=Object.keys(fsPicked).length;
+    $("#fsCount",root).textContent=TOTAL+" items"+(n?" · "+n+" selected":"");
+  }
+  fsTbU.addEventListener("change",function(e){
+    var tr=e.target.closest("tr[data-i]");if(!tr)return;
+    if(e.target.checked)fsPicked[tr.dataset.i]=1;else delete fsPicked[tr.dataset.i];fsDrawU();
+  });
+  fsWire(fsTbU,null,function(i){fsOpen($("#fsPopU",root),i)});
+  $("#fsQ",root).addEventListener("input",function(e){fsQuery=e.target.value.trim().toLowerCase();fsDrawU()});
+  root.querySelectorAll("#fsWinU th[data-k]").forEach(function(th){
+    th.addEventListener("click",function(){fsSort.d=fsSort.k===th.dataset.k?-fsSort.d:1;fsSort.k=th.dataset.k;fsDrawU()});
+  });
+  fsDrawU();fsPaint();
 },
 bookrush:function(root){var d=DATA.project2,f=d.flowShots,n=0;
   var S=[["Order confirmed","The one question from the first search result: can I have this book now, and how fast?","home"],["Preparing your books","Delivery is a tagged union on every book: INSTANT with an ETA, STANDARD or UNAVAILABLE. The unavailable case can't be forgotten.","book-detail"],["Packed with care","One basket can mix speeds. The cart groups by delivery, and instant is offered only when every item qualifies.","cart"],["Picked up","State lives with whoever owns it: Zustand for cart and session, TanStack Query for server data, local state for UI.","profile"],["Out for delivery","Tracking is a six-stage state machine in the order service, polled every 2.5 seconds as it would be against a real endpoint.","tracking"],["Delivered","66 tests, and CI that runs lint, typecheck, tests and an iOS bundle on every push.","community"]];
